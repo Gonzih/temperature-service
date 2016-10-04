@@ -54,6 +54,8 @@ func temperatureHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 	gpioMutex.Lock()
 	defer gpioMutex.Unlock()
 
+	w.Header().Add("Content-Type", "text/plain")
+
 	temperature, humidity, err := readTemperature()
 
 	if err != nil {
