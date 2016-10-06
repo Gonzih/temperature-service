@@ -70,7 +70,7 @@ func readTemperature() error {
 	return nil
 }
 
-func temperatureHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func rawTemperatureHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	gpioMutex.Lock()
 	defer gpioMutex.Unlock()
 
@@ -78,7 +78,7 @@ func temperatureHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 
 	tempeHumidMutex.RLock()
 	defer tempeHumidMutex.RUnlock()
-	fmt.Fprintf(w, "Temperature = %v*C, Humidity = %v%%", temperature, humidity)
+	fmt.Fprintf(w, "T = %v*C, H = %v%%", temperature, humidity)
 }
 
 func startLoop() {
@@ -97,7 +97,7 @@ func startLoop() {
 
 func main() {
 	router := httprouter.New()
-	router.GET("/", temperatureHandler)
+	router.GET("/raw.txt", rawTemperatureHandler)
 
 	startLoop()
 
