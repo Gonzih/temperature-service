@@ -159,6 +159,8 @@ func loadDataFromLog() (values []LogLine) {
 }
 
 func startLoops() {
+	_ = readTemperature()
+
 	go func() {
 		for {
 			err := readTemperature()
