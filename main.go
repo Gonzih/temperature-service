@@ -15,6 +15,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// TemperatureData stores humidity and temperature
 type TemperatureData struct {
 	Temperature float64
 	Humidity    float64
