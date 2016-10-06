@@ -29,7 +29,7 @@ func readTemperature() error {
 	binPath := "/usr/local/bin/temperature.py"
 	log.Printf("Attempting to execute %s\n", binPath)
 
-	cmd := exec.Command("sudo", binPath)
+	cmd := exec.Command(binPath)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
