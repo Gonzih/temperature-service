@@ -1,5 +1,9 @@
 <html>
     <head>
+        <title>Temperature monitoring</title>
+        <link rel="stylesheet" type="text/css" href="/public/main.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"
                 integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
                 crossorigin="anonymous"></script>
@@ -25,9 +29,12 @@ window.humidityData = [
         <script src="/public/chart.js"></script>
     </head>
     <body>
+    <div class="title">
+        <img src="/public/humidity.png"/>
         {{with .CurrentTemperature}}
-        Right now: {{.Temperature}}°C {{.Humidity}}%
+        {{.Temperature}}°C {{.Humidity}}%
         {{end}}
-        <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        </div>
+        <div id="container"></div>
     </body>
 </html>

@@ -1,0 +1,22 @@
+.title {
+        text-align: center;
+        vertical-align: middle;
+        font-size: 30px;
+        line-height: 100px;
+}
+
+.title img {
+        vertical-align: middle;
+        max-height: 50px;
+        display: inline;
+}
+
+#container {
+        min-width: 310px;
+        height: 400px;
+        margin: 0 auto;
+}
+
+.highcharts-credits {
+        display: none;
+}
