@@ -33,7 +33,10 @@ func readTemperature() error {
 		return fmt.Errorf("Error while getting info about current user: %s", err)
 	}
 
-	cmd := exec.Command(usr.HomeDir + "/bin/temperature.py")
+	binPath := usr.HomeDir + "/bin/temperature.py"
+	log.Printf("Attempting to execute %s\n", binPath)
+
+	cmd := exec.Command(binPath)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
