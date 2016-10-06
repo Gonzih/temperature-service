@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+                integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+                crossorigin="anonymous"></script>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+        <script>
+window.temperatureData = [[Date.UTC(2013,5,2),0.7695],
+    [Date.UTC(2013,5,3),0.7648],
+    [Date.UTC(2013,5,4),0.7645],
+    [Date.UTC(2013,5,5),0.7638],
+    [Date.UTC(2013,5,6),0.7549],]
+
+window.humidityData = [[Date.UTC(2013,5,2),0.8695],
+    [Date.UTC(2013,5,3),0.8648],
+    [Date.UTC(2013,5,4),0.8645],
+    [Date.UTC(2013,5,5),0.8638],
+    [Date.UTC(2013,5,6),0.8549],]
+        </script>
+
+        <script src="/public/chart.js"></script>
+    </head>
+    <body>
+        Right now: {{ .Temperature }}°C {{ .Humidity }}%
+        <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    </body>
+</html>

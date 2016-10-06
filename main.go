@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os/exec"
@@ -87,9 +88,6 @@ func startLoop() {
 }
 
 func rawTemperatureHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	gpioMutex.Lock()
-	defer gpioMutex.Unlock()
-
 	w.Header().Add("Content-Type", "text/plain")
 
 	tempeHumidMutex.RLock()
@@ -97,9 +95,16 @@ func rawTemperatureHandler(w http.ResponseWriter, r *http.Request, _ httprouter.
 	fmt.Fprintf(w, "T = %v*C, H = %v%%", temperatureData.Temperature, temperatureData.Humidity)
 }
 
+func indexHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	t, _ := template.ParseFiles("templates/index.html")
+	t.Execute(w, temperatureData)
+}
+
 func main() {
 	router := httprouter.New()
+	router.GET("/", indexHandler)
 	router.GET("/raw.txt", rawTemperatureHandler)
+	router.ServeFiles("/public/*filepath", http.Dir("public/"))
 
 	startLoop()
 
