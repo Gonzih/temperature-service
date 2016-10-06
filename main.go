@@ -94,7 +94,7 @@ func writeDataToLog() {
 	defer tempeHumidMutex.RUnlock()
 
 	if temperatureData.Temperature > 0 && temperatureData.Humidity > 0 {
-		line := fmt.Sprintf("%v,%v\n", temperatureData.Temperature, temperatureData.Humidity)
+		line := fmt.Sprintf("%v,%v,%v\n", time.Now().Unix(), temperatureData.Temperature, temperatureData.Humidity)
 		_, err = f.WriteString(line)
 
 		if err != nil {
