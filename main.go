@@ -37,7 +37,7 @@ func readTemperature() error {
 	gpioMutex.Lock()
 	defer gpioMutex.Unlock()
 
-	err = cmd.Run()
+	err := cmd.Run()
 
 	if err != nil {
 		return err
