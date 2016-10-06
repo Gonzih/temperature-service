@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -14,6 +15,8 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 )
+
+const logFile = "/tmp/temperature.log"
 
 // TemperatureData stores humidity and temperature
 type TemperatureData struct {
@@ -73,7 +76,36 @@ func readTemperature() error {
 	return nil
 }
 
-func startLoop() {
+func writeDataToLog() {
+	if _, err := os.Stat(logFile); os.IsNotExist(err) {
+		os.Create(logFile)
+	}
+
+	f, err := os.OpenFile(logFile, os.O_APPEND|os.O_WRONLY, 0666)
+
+	if err != nil {
+		log.Printf("Error while opening log file: %s\n", err)
+		return
+	}
+
+	defer f.Close()
+
+	tempeHumidMutex.RLock()
+	defer tempeHumidMutex.RUnlock()
+
+	if temperatureData.Temperature > 0 && temperatureData.Humidity > 0 {
+		line := fmt.Sprintf("%v,%v\n", temperatureData.Temperature, temperatureData.Humidity)
+		_, err = f.WriteString(line)
+
+		if err != nil {
+			log.Printf("Error while writing line to the log file: %s", err)
+		}
+	} else {
+		log.Println("Skipping log write since values are 0")
+	}
+}
+
+func startLoops() {
 	go func() {
 		for {
 			err := readTemperature()
@@ -83,6 +115,13 @@ func startLoop() {
 			}
 
 			time.Sleep(time.Minute)
+		}
+	}()
+
+	go func() {
+		for {
+			writeDataToLog()
+			time.Sleep(time.Minute * 10)
 		}
 	}()
 }
@@ -106,7 +145,7 @@ func main() {
 	router.GET("/raw.txt", rawTemperatureHandler)
 	router.ServeFiles("/public/*filepath", http.Dir("public/"))
 
-	startLoop()
+	startLoops()
 
 	log.Println("Ready to serve!")
 	log.Fatal(http.ListenAndServe(":8080", router))
