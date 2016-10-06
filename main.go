@@ -176,7 +176,7 @@ func startLoops() {
 	go func() {
 		for {
 			writeDataToLog()
-			time.Sleep(time.Minute * 10)
+			time.Sleep(time.Minute * 5)
 		}
 	}()
 }
