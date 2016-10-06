@@ -15,10 +15,15 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+type TemperatureData struct {
+	Temperature float64
+	Humidity    float64
+}
+
 var gpioMutex sync.Mutex
 var tempeHumidMutex sync.RWMutex
 
-var temperature, humidity float64
+var temperatureData TemperatureData
 
 func readTemperature() error {
 	usr, err := user.Current()
@@ -64,8 +69,8 @@ func readTemperature() error {
 
 	tempeHumidMutex.Lock()
 	defer tempeHumidMutex.Unlock()
-	temperature = tempTemperature
-	humidity = tempHumidity
+	temperatureData.Temperature = tempTemperature
+	temperatureData.Humidity = tempHumidity
 
 	return nil
 }
@@ -78,7 +83,7 @@ func rawTemperatureHandler(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 	tempeHumidMutex.RLock()
 	defer tempeHumidMutex.RUnlock()
-	fmt.Fprintf(w, "T = %v*C, H = %v%%", temperature, humidity)
+	fmt.Fprintf(w, "T = %v*C, H = %v%%", temperatureData.Temperature, temperatureData.Humidity)
 }
 
 func startLoop() {
