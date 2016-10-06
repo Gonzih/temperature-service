@@ -18,8 +18,6 @@ window.temperatureData = [
         {{end}}
 ]
 
-console.log(window.temperatureData)
-
 window.humidityData = [
         {{range .LogLines}}
         [{{.Time.Unix}} * 1000, {{.Humidity}}],
