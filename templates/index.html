@@ -9,7 +9,7 @@
         <script>
 window.temperatureData = [
         {{range .LogLines}}
-        [{{.Time.Unix}}, {{.Temperature}}],
+        [{{.Time.Unix}} * 1000, {{.Temperature}}],
         {{end}}
 ]
 
@@ -17,7 +17,7 @@ console.log(window.temperatureData)
 
 window.humidityData = [
         {{range .LogLines}}
-        [{{.Time.Unix}}, {{.Humidity}}],
+        [{{.Time.Unix}} * 1000, {{.Humidity}}],
         {{end}}
 ]
         </script>
