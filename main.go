@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -20,6 +22,13 @@ const logFile = "/tmp/temperature.log"
 
 // TemperatureData stores humidity and temperature
 type TemperatureData struct {
+	Temperature float64
+	Humidity    float64
+}
+
+// LogLine defines log data structure
+type LogLine struct {
+	UnixTS      int64
 	Temperature float64
 	Humidity    float64
 }
@@ -94,9 +103,20 @@ func writeDataToLog() {
 	defer tempeHumidMutex.RUnlock()
 
 	if temperatureData.Temperature > 0 && temperatureData.Humidity > 0 {
-		line := fmt.Sprintf("%v,%v,%v\n", time.Now().Unix(), temperatureData.Temperature, temperatureData.Humidity)
-		_, err = f.WriteString(line)
+		line := LogLine{
+			UnixTS:      time.Now().Unix(),
+			Temperature: temperatureData.Temperature,
+			Humidity:    temperatureData.Humidity,
+		}
 
+		encodedLine, err := json.Marshal(line)
+
+		_, err = f.Write(encodedLine)
+		if err != nil {
+			log.Printf("Error while writing line to the log file: %s", err)
+		}
+
+		_, err = f.WriteString("\n")
 		if err != nil {
 			log.Printf("Error while writing line to the log file: %s", err)
 		}
@@ -105,7 +125,30 @@ func writeDataToLog() {
 	}
 }
 
+func loadDataFromLog() {
+	blob, err := ioutil.ReadFile(logFile)
+
+	if err != nil {
+		log.Printf("Error while reading log file data: %s", err)
+	}
+
+	lines := bytes.Split(blob, []byte("\n"))
+
+	for _, encodedLine := range lines {
+		var line LogLine
+		err := json.Unmarshal(encodedLine, &line)
+
+		if err != nil {
+			log.Printf("Error unmarshaling line: %s for data %s", err, string(encodedLine))
+		}
+
+		fmt.Println(line)
+	}
+}
+
 func startLoops() {
+	// _ = readTemperature()
+
 	go func() {
 		for {
 			err := readTemperature()
@@ -144,6 +187,8 @@ func main() {
 	router.GET("/", indexHandler)
 	router.GET("/raw.txt", rawTemperatureHandler)
 	router.ServeFiles("/public/*filepath", http.Dir("public/"))
+
+	// loadDataFromLog()
 
 	startLoops()
 
