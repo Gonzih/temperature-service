@@ -7,23 +7,27 @@
         <script src="https://code.highcharts.com/modules/exporting.js"></script>
 
         <script>
-window.temperatureData = [[Date.UTC(2013,5,2),0.7695],
-    [Date.UTC(2013,5,3),0.7648],
-    [Date.UTC(2013,5,4),0.7645],
-    [Date.UTC(2013,5,5),0.7638],
-    [Date.UTC(2013,5,6),0.7549],]
+window.temperatureData = [
+        {{range .LogLines}}
+        [{{.Time.Unix}}, {{.Temperature}}],
+        {{end}}
+]
 
-window.humidityData = [[Date.UTC(2013,5,2),0.8695],
-    [Date.UTC(2013,5,3),0.8648],
-    [Date.UTC(2013,5,4),0.8645],
-    [Date.UTC(2013,5,5),0.8638],
-    [Date.UTC(2013,5,6),0.8549],]
+console.log(window.temperatureData)
+
+window.humidityData = [
+        {{range .LogLines}}
+        [{{.Time.Unix}}, {{.Humidity}}],
+        {{end}}
+]
         </script>
 
         <script src="/public/chart.js"></script>
     </head>
     <body>
-        Right now: {{ .Temperature }}°C {{ .Humidity }}%
+        {{with .CurrentTemperature}}
+        Right now: {{.Temperature}}°C {{.Humidity}}%
+        {{end}}
         <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
     </body>
 </html>

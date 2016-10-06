@@ -28,9 +28,15 @@ type TemperatureData struct {
 
 // LogLine defines log data structure
 type LogLine struct {
-	UnixTS      int64
+	Time        time.Time
 	Temperature float64
 	Humidity    float64
+}
+
+// TemplateInput holds data for index template
+type TemplateInput struct {
+	CurrentTemperature TemperatureData
+	LogLines           []LogLine
 }
 
 var gpioMutex sync.Mutex
@@ -104,7 +110,7 @@ func writeDataToLog() {
 
 	if temperatureData.Temperature > 0 && temperatureData.Humidity > 0 {
 		line := LogLine{
-			UnixTS:      time.Now().Unix(),
+			Time:        time.Now(),
 			Temperature: temperatureData.Temperature,
 			Humidity:    temperatureData.Humidity,
 		}
@@ -125,7 +131,7 @@ func writeDataToLog() {
 	}
 }
 
-func loadDataFromLog() {
+func loadDataFromLog() (values []LogLine) {
 	blob, err := ioutil.ReadFile(logFile)
 
 	if err != nil {
@@ -134,21 +140,25 @@ func loadDataFromLog() {
 
 	lines := bytes.Split(blob, []byte("\n"))
 
+	timeToFilterBy := time.Now().Add(-24 * time.Hour)
+
 	for _, encodedLine := range lines {
 		var line LogLine
 		err := json.Unmarshal(encodedLine, &line)
 
 		if err != nil {
-			log.Printf("Error unmarshaling line: %s for data %s", err, string(encodedLine))
+			log.Printf("Error unmarshaling line: %s for data '%s'", err, string(encodedLine))
+		} else {
+			if line.Time.After(timeToFilterBy) {
+				values = append(values, line)
+			}
 		}
-
-		fmt.Println(line)
 	}
+
+	return
 }
 
 func startLoops() {
-	// _ = readTemperature()
-
 	go func() {
 		for {
 			err := readTemperature()
@@ -179,7 +189,18 @@ func rawTemperatureHandler(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 func indexHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	t, _ := template.ParseFiles("templates/index.html")
-	t.Execute(w, temperatureData)
+
+	logLines := loadDataFromLog()
+
+	tempeHumidMutex.RLock()
+	defer tempeHumidMutex.RUnlock()
+
+	input := TemplateInput{
+		CurrentTemperature: temperatureData,
+		LogLines:           logLines,
+	}
+
+	t.Execute(w, input)
 }
 
 func main() {
@@ -187,8 +208,6 @@ func main() {
 	router.GET("/", indexHandler)
 	router.GET("/raw.txt", rawTemperatureHandler)
 	router.ServeFiles("/public/*filepath", http.Dir("public/"))
-
-	// loadDataFromLog()
 
 	startLoops()
 

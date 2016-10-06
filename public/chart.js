@@ -4,7 +4,7 @@ $(function () {
             zoomType: 'x'
         },
         title: {
-            text: 'Temperature and humidity'
+            text: 'Temperature and humidity history'
         },
         subtitle: {
             text: document.ontouchstart === undefined ?
