@@ -1,4 +1,10 @@
 $(function () {
+    Highcharts.setOptions({
+        global: {
+            useUTC: false,
+        },
+    });
+
     $('#container').highcharts({
         chart: {
             zoomType: 'x'
