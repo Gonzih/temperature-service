@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
-	"os/user"
 	"strconv"
 	"strings"
 	"sync"
@@ -27,13 +26,7 @@ var tempeHumidMutex sync.RWMutex
 var temperatureData TemperatureData
 
 func readTemperature() error {
-	usr, err := user.Current()
-
-	if err != nil {
-		return fmt.Errorf("Error while getting info about current user: %s", err)
-	}
-
-	binPath := usr.HomeDir + "/bin/temperature.py"
+	binPath := "/usr/local/bin/temperature.py"
 	log.Printf("Attempting to execute %s\n", binPath)
 
 	cmd := exec.Command("sudo", binPath)
