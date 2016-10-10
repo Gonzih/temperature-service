@@ -18,7 +18,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-const logFile = "/tmp/temperature.log"
+const logFile = "/home/temperature.log"
 
 // TemperatureData stores humidity and temperature
 type TemperatureData struct {
