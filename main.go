@@ -28,9 +28,9 @@ type TemperatureData struct {
 
 // LogLine defines log data structure
 type LogLine struct {
-	Time        time.Time
-	Temperature float64
-	Humidity    float64
+	Time        time.Time `json:"time"`
+	Temperature float64   `json:"temperature"`
+	Humidity    float64   `json:"humidity"`
 }
 
 // TemplateInput holds data for index template
